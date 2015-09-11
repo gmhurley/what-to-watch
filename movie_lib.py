@@ -2,6 +2,7 @@ import csv
 
 MOVIE_DICT = {}
 RATINGS = {}
+USERS = {}
 
 with open('movie_data.txt', 'r') as f:
     reader = csv.reader(f, delimiter='|')
@@ -21,6 +22,14 @@ with open('data.txt') as datafile:
                             'rating': row[2],
                             'timestamp': row[3]}
         key_num += 1
+
+with open('users.txt') as userfile:
+    reader = csv.reader(userfile, delimiter='|')
+    for row in reader:
+        USERS[row[0]] = {'age': row[1],
+                         'gender': row[2],
+                         'occupation': row[3],
+                         'zip': row[4]}
 
 
 class Movie:
