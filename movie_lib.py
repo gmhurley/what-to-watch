@@ -59,4 +59,10 @@ class User:
 
 
 class Ratings:
-    pass
+
+    def top_x(self, inp):
+        top_lst = []
+        for k, v in MOVIE_DICT.items():
+            top_lst.append([Movie().avg_rating(k), v['Name']])
+        return sorted(top_lst, reverse=True)[:inp]
+
