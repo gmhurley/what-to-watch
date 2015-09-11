@@ -57,12 +57,22 @@ class User:
     def all_user_ratings(self, inp):
         return [v['rating'] for k, v in RATINGS.items() if (v['user_id']) == inp]
 
+    def watched(self, user):
+        return [v['movie_id'] for k, v in RATINGS.items() if (v['user_id'] == user)]
+
 
 class Ratings:
 
-    def top_x(self, inp):
+    def top_x(self, num):
         top_lst = []
         for k, v in MOVIE_DICT.items():
             top_lst.append([Movie().avg_rating(k), v['Name']])
-        return sorted(top_lst, reverse=True)[:inp]
+        return sorted(top_lst, reverse=True)[:num]
 
+    def top_x_not_watched(self, num, user):
+        watched = User().watched(user)
+        top_lst = [[Movie().avg_rating(k), v['Name']] for k, v in MOVIE_DICT.items() if k not in watched]
+        return sorted(top_lst, reverse=True)[:num]
+
+print(Ratings().top_x(10))
+print(Ratings().top_x_not_watched(10, '745'))
