@@ -1,5 +1,46 @@
 import csv
 
+movies = {}
+users = {}
+
+
+def main():
+    # Create Movie objects for each item in u.item file
+    with open('u.item', encoding='latin_1') as f:
+        reader = csv.reader(f, delimiter='|')
+        for row in reader:
+            # movie id | movie title | release date | video release date | IMDb URL | genres
+            movies[row[0]] = Movie(id=row[0],
+                                   name=row[1],
+                                   release_date=row[2],
+                                   video_release_date=row[3],
+                                   imdb_url=row[4],
+                                   genres=row[5])
+
+    # Create user objects for each item in u.user file
+    with open('u.user') as f:
+        reader = csv.reader(f, delimiter='|')
+        for row in reader:
+            users[row[0]] = User(id=row[0],
+                                 age=row[1],
+                                 gender=row[2],
+                                 occupation=row[3])
+
+    # Add ratings to movie and user objects
+    with open('u.data') as f:
+        reader = csv.reader(f, delimiter='\t')
+        for row in reader:
+            # user id | item id | rating | timestamp.
+            users[row[0]].ratings[row[1]] = {'rating': row[2], 'timestamp': row[3]}
+            movies[row[1]].ratings[row[0]] = {'rating': row[2], 'timestamp': row[3]}
+
+    # Calculate average rating for each movie and user
+    for movie in movies.values():
+        movie.avg_rating = Ratings.avg_rating(movie.ratings)
+
+    for user in users.values():
+        user.avg_rating = Ratings.avg_rating(user.ratings)
+
 
 class Movie:
 
@@ -8,12 +49,16 @@ class Movie:
         self.name = ''
         self.release_date = ''
         self.video_release_date = ''
+        self.imdb_url = ''
         self.genres = []
         self.ratings = {}
-        self.avg_rating = 0
+        self.avg_rating = ''
 
         for k, v in kwargs.items():
             setattr(self, k, v)
+
+    def update_ratings(self, inp):
+        self.ratings = inp
 
 
 class User:
@@ -30,31 +75,17 @@ class User:
         self.occupation = ''
         self.zip = ''
         self.ratings = {}
-        self.avg_rating = 0
+        self.avg_rating = ''
 
         for k, v in kwargs.items():
             setattr(self, k, v)
 
 
-movie_dict = {}
-users = {}
+class Ratings:
 
-# Create Movie objects for each item in u.item file
-with open('u.item', encoding='latin_1') as f:
-    reader = csv.reader(f, delimiter='|')
-    for row in reader:
-        movie_dict[row[0]] = Movie(id=row[0],
-                                   name=row[1],
-                                   release_date=row[2],
-                                   video_release_date=row[3],
-                                   genres=row[4])
+    def avg_rating(ratings):
+        all_ratings = [int(x.get('rating')) for x in ratings.values()]
+        return "%.2f" % float(sum(all_ratings)/len(all_ratings))
 
-# Create user objects for each item in u.user file
-with open('u.user') as f:
-    reader = csv.reader(f, delimiter='|')
-    for row in reader:
-        users[row[0]] = User(id=row[0],
-                             age=row[1],
-                             gender=row[2],
-                             occupation=row[3])
-
+if __name__ == '__main__':
+    main()
