@@ -86,17 +86,17 @@ class Ratings:
         all_ratings = [int(x.get('rating')) for x in ratings.values()]
         return "%.2f" % float(sum(all_ratings)/len(all_ratings))
 
-    def get_top_x(x):
+    def get_top_x(x, min_ratings):
         top_list = []
         for movie in movies.values():
-            top_list.append([movie.avg_rating, movie.name])
+            if (len(movie.ratings)) > int(min_ratings):
+                top_list.append([movie.avg_rating, movie.name])
         return sorted(top_list, reverse=True)[:int(x)]
 
-    def get_user_top_x(id, x):
+    def get_user_top_x(id, x, min_ratings):
         watched = users[id].ratings.keys()
-        top_x = [[movies[k].avg_rating, movies[k].name] for k in movies.keys() if k not in watched]
+        top_x = [[movies[k].avg_rating, movies[k].name] for k in movies.keys() if k not in watched and len(movies[k].ratings) > int(min_ratings)]
         return sorted(top_x, reverse=True)[:int(x)]
-
 
 if __name__ == '__main__':
     main()
