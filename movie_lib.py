@@ -46,27 +46,9 @@ def main():
     #     print(user.id)
 
     # Each list is made up of ratings for movies they've both seen in the same order
-    user_1_movies = [x for x in users['22'].ratings.keys()]
-    user_2_movies = [x for x in users['23'].ratings.keys()]
-    same_movies = [x for x in user_1_movies if x in user_2_movies]
-    users_ratings = {}
-    for x in same_movies:
-        user1_ratings = users['22'].ratings.get(x).get('rating')
-        user2_ratings = users['23'].ratings.get(x).get('rating')
-        users_ratings[x] = {'user_1': user1_ratings, 'user_2': user2_ratings}
 
-    user1_ordered_ratings = []
-    user2_ordered_ratings = []
 
-    for k, v in users_ratings.items():
-        print(k, v)
-        user1_ordered_ratings.append(int(v['user_1']))
-        user2_ordered_ratings.append(int(v['user_2']))
-
-    print(user1_ordered_ratings)
-    print(user2_ordered_ratings)
-
-    print(Ratings.euclidean_distance(user1_ordered_ratings, user2_ordered_ratings))
+    print(Ratings.euclidean_distance('22', '23'))
 
 
     # user_1_ratings = [users['22'].ratings.get(x).get('rating') for x in same_movies]
@@ -144,8 +126,26 @@ class Ratings:
         """Given two lists, give the Euclidean distance between them on a scale
         of 0 to 1. 1 means the two lists are identical.
         """
+        user_1_movies = [x for x in users[v].ratings.keys()]
+        user_2_movies = [x for x in users[w].ratings.keys()]
+        same_movies = [x for x in user_1_movies if x in user_2_movies]
+        users_ratings = {}
+        for x in same_movies:
+            user1_ratings = users[v].ratings.get(x).get('rating')
+            user2_ratings = users[w].ratings.get(x).get('rating')
+            users_ratings[x] = {'user_1': user1_ratings, 'user_2': user2_ratings}
+
+        user1_ordered_ratings = []
+        user2_ordered_ratings = []
+
+        for k, val in users_ratings.items():
+            print(k, val)
+            user1_ordered_ratings.append(int(val['user_1']))
+            user2_ordered_ratings.append(int(val['user_2']))
 
         # Guard against empty lists.
+        v = int(v)
+        w = int(w)
         if len(v) is 0:
             return 0
 
