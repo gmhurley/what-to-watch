@@ -1,6 +1,8 @@
 import csv
 import math
 
+from operator import itemgetter
+
 movies = {}
 users = {}
 
@@ -41,23 +43,36 @@ def main():
     for user in users.values():
         user.avg_rating = Ratings.avg_rating(user.ratings)
 
-    # Find similar tastes
-    # for user in users.values():
-    #     print(user.id)
+    similiar_users = Ratings.similiar_users('22')
+    movies_seen = [x for x in users['22'].ratings.keys()]
+    suggested_movies = {}
 
-    # Each list is made up of ratings for movies they've both seen in the same order
+    for user in similiar_users:
+        # get users movies
+        user_movies = list(users[user[0]].ratings.keys())
+        for movie in user_movies:
+            if movie not in movies_seen:
+                # get users rating for the movie
+                user_movie_rating = users[user[0]].ratings[movie]['rating']
 
+                # multiply similarity and users rating
+                user_movie_weight = user[1] * float(user_movie_rating)
 
-    print(Ratings.euclidean_distance('22', '23'))
+                # check if movie in suggested movies
+                if movie in suggested_movies:
+                    suggested_movies[movie] += user_movie_weight
+                else:
+                    suggested_movies[movie] = user_movie_weight
 
+    sorted_suggestions = []
+    for k, v in suggested_movies.items():
+        sorted_suggestions.append([k, v])
 
-    # user_1_ratings = [users['22'].ratings.get(x).get('rating') for x in same_movies]
-    # print(user_1_ratings)
+    top_10_suggested = (sorted(sorted_suggestions, key=itemgetter(1), reverse=True)[:10])
+    print(top_10_suggested)
+    top_10_suggested = [x[0] for x in top_10_suggested]
+    # print(top_10_suggested)
 
-    # print(users['22'].ratings.items())
-    # print(user_1, "\n")
-    # print(user_2, "\n")
-    # print(same_movies, "\n")
 
 
 class Movie:
@@ -114,12 +129,12 @@ class Ratings:
         top_list = []
         for movie in movies.values():
             if (len(movie.ratings)) > int(min_ratings):
-                top_list.append([movie.avg_rating, movie.name])
+                top_list.append([movie.id, movie.avg_rating, movie.name])
         return sorted(top_list, reverse=True)[:int(x)]
 
     def get_user_top_x(id, x, min_ratings):
         watched = users[id].ratings.keys()
-        top_x = [[movies[k].avg_rating, movies[k].name] for k in movies.keys() if k not in watched and len(movies[k].ratings) > int(min_ratings)]
+        top_x = [[movies[k].id, movies[k].avg_rating, movies[k].name] for k in movies.keys() if k not in watched and len(movies[k].ratings) > int(min_ratings)]
         return sorted(top_x, reverse=True)[:int(x)]
 
     def euclidean_distance(usr1, usr2):
@@ -154,6 +169,14 @@ class Ratings:
         sum_of_squares = sum(squares)
 
         return 1 / (1 + math.sqrt(sum_of_squares))
+
+    def similiar_users(usr1):
+        """Returns a list of lists with [userid, similarity]"""
+        ratings = []
+        for usr2 in users.keys():
+            ratings.append([usr2, Ratings.euclidean_distance(users[usr1].id, usr2)])
+        return sorted(ratings, key=itemgetter(1), reverse=True)[:1000]
+
 
 if __name__ == '__main__':
     main()
