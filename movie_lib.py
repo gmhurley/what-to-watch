@@ -30,7 +30,6 @@ def main():
     with open('u.data') as f:
         reader = csv.reader(f, delimiter='\t')
         for row in reader:
-            # user id | item id | rating | timestamp.
             users[row[0]].ratings[row[1]] = {'rating': row[2], 'timestamp': row[3]}
             movies[row[1]].ratings[row[0]] = {'rating': row[2], 'timestamp': row[3]}
 
@@ -86,6 +85,18 @@ class Ratings:
     def avg_rating(ratings):
         all_ratings = [int(x.get('rating')) for x in ratings.values()]
         return "%.2f" % float(sum(all_ratings)/len(all_ratings))
+
+    def get_top_x(x):
+        top_list = []
+        for movie in movies.values():
+            top_list.append([movie.avg_rating, movie.name])
+        return sorted(top_list, reverse=True)[:int(x)]
+
+    def get_user_top_x(id, x):
+        watched = users[id].ratings.keys()
+        top_x = [[movies[k].avg_rating, movies[k].name] for k in movies.keys() if k not in watched]
+        return sorted(top_x, reverse=True)[:int(x)]
+
 
 if __name__ == '__main__':
     main()
