@@ -122,36 +122,35 @@ class Ratings:
         top_x = [[movies[k].avg_rating, movies[k].name] for k in movies.keys() if k not in watched and len(movies[k].ratings) > int(min_ratings)]
         return sorted(top_x, reverse=True)[:int(x)]
 
-    def euclidean_distance(v, w):
+    def euclidean_distance(usr1, usr2):
         """Given two lists, give the Euclidean distance between them on a scale
         of 0 to 1. 1 means the two lists are identical.
         """
-        user_1_movies = [x for x in users[v].ratings.keys()]
-        user_2_movies = [x for x in users[w].ratings.keys()]
-        same_movies = [x for x in user_1_movies if x in user_2_movies]
+        usr1_movies = [movie_id for movie_id in users[usr1].ratings.keys()]
+        usr2_movies = [movie_id for movie_id in users[usr2].ratings.keys()]
+        same_movies = [movie_id for movie_id in usr1_movies if movie_id in usr2_movies]
         users_ratings = {}
-        for x in same_movies:
-            user1_ratings = users[v].ratings.get(x).get('rating')
-            user2_ratings = users[w].ratings.get(x).get('rating')
-            users_ratings[x] = {'user_1': user1_ratings, 'user_2': user2_ratings}
+        for movie_id in same_movies:
+            user1_ratings = users[usr1].ratings.get(movie_id).get('rating')
+            user2_ratings = users[usr2].ratings.get(movie_id).get('rating')
+            users_ratings[movie_id] = {'user_1': user1_ratings, 'user_2': user2_ratings}
 
-        user1_ordered_ratings = []
-        user2_ordered_ratings = []
+        user1_ratings = []
+        user2_ratings = []
 
-        for k, val in users_ratings.items():
-            print(k, val)
-            user1_ordered_ratings.append(int(val['user_1']))
-            user2_ordered_ratings.append(int(val['user_2']))
+        for movie_id in users_ratings.values():
+            user1_ratings.append(int(movie_id['user_1']))
+            user2_ratings.append(int(movie_id['user_2']))
 
         # Guard against empty lists.
-        v = int(v)
-        w = int(w)
-        if len(v) is 0:
+        # v = user1_ordered_ratings
+        # w = user2_ordered_ratings
+        if len(user1_ratings) is 0:
             return 0
 
         # Note that this is the same as vector subtraction.
-        differences = [v[idx] - w[idx] for idx in range(len(v))]
-        squares = [diff ** 2 for diff in differences]
+        diffs = [user1_ratings[idx] - user2_ratings[idx] for idx in range(len(user1_ratings))]
+        squares = [diff ** 2 for diff in diffs]
         sum_of_squares = sum(squares)
 
         return 1 / (1 + math.sqrt(sum_of_squares))
