@@ -43,36 +43,7 @@ def main():
     for user in users.values():
         user.avg_rating = Ratings.avg_rating(user.ratings)
 
-    similiar_users = Ratings.similiar_users('22')
-    movies_seen = [x for x in users['22'].ratings.keys()]
-    suggested_movies = {}
-
-    for user in similiar_users:
-        # get users movies
-        user_movies = list(users[user[0]].ratings.keys())
-        for movie in user_movies:
-            if movie not in movies_seen:
-                # get users rating for the movie
-                user_movie_rating = users[user[0]].ratings[movie]['rating']
-
-                # multiply similarity and users rating
-                user_movie_weight = user[1] * float(user_movie_rating)
-
-                # check if movie in suggested movies
-                if movie in suggested_movies:
-                    suggested_movies[movie] += user_movie_weight
-                else:
-                    suggested_movies[movie] = user_movie_weight
-
-    sorted_suggestions = []
-    for k, v in suggested_movies.items():
-        sorted_suggestions.append([k, v])
-
-    top_10_suggested = (sorted(sorted_suggestions, key=itemgetter(1), reverse=True)[:10])
-    print(top_10_suggested)
-    top_10_suggested = [x[0] for x in top_10_suggested]
-    # print(top_10_suggested)
-
+    print(Ratings.recommended_movies('22'))
 
 
 class Movie:
@@ -176,6 +147,29 @@ class Ratings:
         for usr2 in users.keys():
             ratings.append([usr2, Ratings.euclidean_distance(users[usr1].id, usr2)])
         return sorted(ratings, key=itemgetter(1), reverse=True)[:1000]
+
+    def recommended_movies(usr1):
+        similiar_users = Ratings.similiar_users(usr1)
+        movies_seen = [x for x in users[usr1].ratings.keys()]
+        suggested_movies = {}
+
+        for user in similiar_users:
+            user_movies = list(users[user[0]].ratings.keys())
+            for movie in user_movies:
+                if movie not in movies_seen:
+                    user_movie_rating = users[user[0]].ratings[movie]['rating']
+                    user_movie_weight = user[1] * float(user_movie_rating)
+                    if movie in suggested_movies:
+                        suggested_movies[movie] += user_movie_weight
+                    else:
+                        suggested_movies[movie] = user_movie_weight
+
+        sorted_suggestions = []
+        for k, v in suggested_movies.items():
+            sorted_suggestions.append([k, v])
+
+        top_10_suggested = (sorted(sorted_suggestions, key=itemgetter(1), reverse=True)[:10])
+        return [x[0] for x in top_10_suggested]
 
 
 if __name__ == '__main__':
