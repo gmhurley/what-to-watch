@@ -1,4 +1,5 @@
 import csv
+import math
 
 movies = {}
 users = {}
@@ -40,6 +41,42 @@ def main():
     for user in users.values():
         user.avg_rating = Ratings.avg_rating(user.ratings)
 
+    # Find similar tastes
+    # for user in users.values():
+    #     print(user.id)
+
+    # Each list is made up of ratings for movies they've both seen in the same order
+    user_1_movies = [x for x in users['22'].ratings.keys()]
+    user_2_movies = [x for x in users['23'].ratings.keys()]
+    same_movies = [x for x in user_1_movies if x in user_2_movies]
+    users_ratings = {}
+    for x in same_movies:
+        user1_ratings = users['22'].ratings.get(x).get('rating')
+        user2_ratings = users['23'].ratings.get(x).get('rating')
+        users_ratings[x] = {'user_1': user1_ratings, 'user_2': user2_ratings}
+
+    user1_ordered_ratings = []
+    user2_ordered_ratings = []
+
+    for k, v in users_ratings.items():
+        print(k, v)
+        user1_ordered_ratings.append(int(v['user_1']))
+        user2_ordered_ratings.append(int(v['user_2']))
+
+    print(user1_ordered_ratings)
+    print(user2_ordered_ratings)
+
+    print(Ratings.euclidean_distance(user1_ordered_ratings, user2_ordered_ratings))
+
+
+    # user_1_ratings = [users['22'].ratings.get(x).get('rating') for x in same_movies]
+    # print(user_1_ratings)
+
+    # print(users['22'].ratings.items())
+    # print(user_1, "\n")
+    # print(user_2, "\n")
+    # print(same_movies, "\n")
+
 
 class Movie:
 
@@ -52,12 +89,17 @@ class Movie:
         self.genres = []
         self.ratings = {}
         self.avg_rating = ''
+        self.similar_users = []
 
         for k, v in kwargs.items():
             setattr(self, k, v)
 
     def update_ratings(self, inp):
         self.ratings = inp
+
+
+class Interface:
+    pass
 
 
 class User:
@@ -97,6 +139,22 @@ class Ratings:
         watched = users[id].ratings.keys()
         top_x = [[movies[k].avg_rating, movies[k].name] for k in movies.keys() if k not in watched and len(movies[k].ratings) > int(min_ratings)]
         return sorted(top_x, reverse=True)[:int(x)]
+
+    def euclidean_distance(v, w):
+        """Given two lists, give the Euclidean distance between them on a scale
+        of 0 to 1. 1 means the two lists are identical.
+        """
+
+        # Guard against empty lists.
+        if len(v) is 0:
+            return 0
+
+        # Note that this is the same as vector subtraction.
+        differences = [v[idx] - w[idx] for idx in range(len(v))]
+        squares = [diff ** 2 for diff in differences]
+        sum_of_squares = sum(squares)
+
+        return 1 / (1 + math.sqrt(sum_of_squares))
 
 if __name__ == '__main__':
     main()
