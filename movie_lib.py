@@ -123,8 +123,10 @@ class Ratings:
         return sorted(top_x, reverse=True)[:int(x)]
 
     def euclidean_distance(usr1, usr2):
-        """Given two lists, give the Euclidean distance between them on a scale
-        of 0 to 1. 1 means the two lists are identical.
+        """
+        Given two user ids, give the Euclidean distance between their
+        movie ratings on a scale of 0 to 1. 1 means the two lists are
+        identical.
         """
         usr1_movies = [movie_id for movie_id in users[usr1].ratings.keys()]
         usr2_movies = [movie_id for movie_id in users[usr2].ratings.keys()]
@@ -143,8 +145,6 @@ class Ratings:
             user2_ratings.append(int(movie_id['user_2']))
 
         # Guard against empty lists.
-        # v = user1_ordered_ratings
-        # w = user2_ordered_ratings
         if len(user1_ratings) is 0:
             return 0
 
