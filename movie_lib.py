@@ -43,8 +43,6 @@ def main():
     for user in users.values():
         user.avg_rating = Ratings.avg_rating(user.ratings)
 
-    print(Ratings.recommended_movies('22'))
-
 
 class Movie:
 
