@@ -43,6 +43,8 @@ def main():
     for user in users.values():
         user.avg_rating = Ratings.avg_rating(user.ratings)
 
+    Interface.program_loop()
+
 
 class Movie:
 
@@ -65,7 +67,24 @@ class Movie:
 
 
 class Interface:
-    pass
+
+    def program_loop():
+        while True:
+            print("Welcome to Movie Database")
+            user_input = 0
+            while user_input not in ('1', '2'):
+                user_input = input('1. See top movies.\n2. Search by user.\n>>> ')
+            if user_input == '1':
+                Interface.show_top_movies()
+            else:
+                Interface.user_movies()
+
+    def show_top_movies():
+        num_of_movies = input('How many movies should be displayed? ')
+        movies = Ratings.get_top_x(num_of_movies, 150)
+        for movie in enumerate(movies):
+            print(movie[0] + 1, ": ", movie[1][2])
+        Interface.program_loop()
 
 
 class User:
@@ -99,7 +118,7 @@ class Ratings:
         for movie in movies.values():
             if (len(movie.ratings)) > int(min_ratings):
                 top_list.append([movie.id, movie.avg_rating, movie.name])
-        return sorted(top_list, reverse=True)[:int(x)]
+        return sorted(top_list, reverse=True,  key=lambda y: y[1])[:int(x)]
 
     def get_user_top_x(id, x, min_ratings):
         watched = users[id].ratings.keys()
