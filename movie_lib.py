@@ -72,29 +72,42 @@ class Interface:
         while True:
             print("Welcome to Movie Database")
             user_input = 0
-            while user_input not in ('1', '2'):
-                user_input = input('1. See top movies.\n2. Search by user.\n>>> ')
+            while user_input not in ('1', '2', '3'):
+                user_input = input('1. See top movies.\n2. Search by user.\n3. Quit.\n>>> ')
             if user_input == '1':
                 Interface.show_top_movies()
-            else:
+            elif user_input == '2':
                 Interface.user_movies()
+            else:
+                exit()
 
     def show_top_movies():
         num_of_movies = input('How many movies should be displayed? ')
-        movies = Ratings.get_top_x(num_of_movies, 150)
-        for movie in enumerate(movies):
+        top_movies = Ratings.get_top_x(num_of_movies, 150)
+        num = 1
+        for movie in enumerate(top_movies):
             print(movie[0] + 1, ": ", movie[1][2])
-        Interface.program_loop()
+            num += 1
 
     def user_movies():
         user_num = input('Please enter a user number: ')
         user_choice = 0
         while user_choice not in ('1', '2'):
-            user_choice = input('1. See top rated, popular movies.\n2. See movie recommentations.\n>>> ')
+            user_choice = input('1. Top rated, popular movies, you havn\'t seen.\n2. Movie recommentations.\n>>> ')
         if user_choice == '1':
-            print(Ratings.get_user_top_x(user_num, 20, 150))
+            user_movies = Ratings.get_user_top_x(user_num, 10, 150)
+            for movie in enumerate(user_movies):
+                print(movie[0] + 1, ": ", movie[1][2])
         else:
-            Ratings.recommended_movies(user_num)
+            user_movies = Ratings.recommended_movies(user_num)
+            num = 1
+            for movie in user_movies:
+                print(num, ": ", movies[movie].name)
+                num += 1
+
+    def print_movie_list(user_movies):
+        for movie in enumerate(movies):
+            print(movie[0] + 1, ": ", movie[1][2])
 
 
 class User:
@@ -133,7 +146,7 @@ class Ratings:
     def get_user_top_x(id, x, min_ratings):
         watched = users[id].ratings.keys()
         top_x = [[movies[k].id, movies[k].avg_rating, movies[k].name] for k in movies.keys() if k not in watched and len(movies[k].ratings) > int(min_ratings)]
-        return sorted(top_x, reverse=True)[:int(x)]
+        return sorted(top_x, reverse=True, key=lambda y: y[1])[:int(x)]
 
     def euclidean_distance(usr1, usr2):
         """
