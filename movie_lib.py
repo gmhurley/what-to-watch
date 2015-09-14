@@ -86,6 +86,16 @@ class Interface:
             print(movie[0] + 1, ": ", movie[1][2])
         Interface.program_loop()
 
+    def user_movies():
+        user_num = input('Please enter a user number: ')
+        user_choice = 0
+        while user_choice not in ('1', '2'):
+            user_choice = input('1. See top rated, popular movies.\n2. See movie recommentations.\n>>> ')
+        if user_choice == '1':
+            print(Ratings.get_user_top_x(user_num, 20, 150))
+        else:
+            Ratings.recommended_movies(user_num)
+
 
 class User:
 
